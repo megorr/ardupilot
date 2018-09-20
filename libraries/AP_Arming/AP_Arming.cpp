@@ -334,6 +334,7 @@ bool AP_Arming::compass_checks(bool report)
         }
 
         //check if compass is calibrating
+        
         if (_compass.is_calibrating()) {
             check_failed(ARMING_CHECK_COMPASS, report, "Compass calibration running");
             return false;
@@ -364,6 +365,14 @@ bool AP_Arming::compass_checks(bool report)
             check_failed(ARMING_CHECK_COMPASS, report, "Compasses inconsistent");
             return false;
         }
+    }
+    // check if start angle is between +- 5 degrees.
+    if ((AP::ahrs().yaw_sensor > 500) && (AP::ahrs().yaw_sensor < 35500)) {
+        check_failed(ARMING_CHECK_COMPASS, report, "PreArm: Yaw too large for auto start %d deg", AP::ahrs().yaw_sensor / 100);
+       /* if (report) {
+            GCS_MAVLINK::send_statustext_all(MAV_SEVERITY_CRITICAL, "PreArm: Yaw too large for auto start %d deg", AP::ahrs().yaw_sensor / 100);
+        }*/
+        return false;
     }
 
     return true;
